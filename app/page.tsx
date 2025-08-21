@@ -53,6 +53,14 @@ function UserMenu({ user }: { user: NonNullable<Session["user"]> }) {
         >
           View profile
         </Link>
+        {user.role === "ADMIN" && (
+          <Link
+            href="/admin"
+            className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium hover:bg-gray-50 transition-colors"
+          >
+            Admin dashboard
+          </Link>
+        )}
         <SignOutButton />
       </div>
     </div>
@@ -129,17 +137,20 @@ const users = await prisma.user.findMany({
           </p>
         </div>
 
-        <div>
-          <h2 className="text-2xl font-bold mb-6 text-gray-900">
-            Community Members
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {users.map((user) => (
-              <UserCard key={user.id} user={user} />
-            ))}
-          </div>
+      <div>
+        <h2 className="text-2xl font-bold mb-6 text-gray-900">
+          Community Members
+        </h2>
+        {session?.user.role === "ADMIN" && (
+          <p className="mb-4 text-sm text-gray-500">You are viewing this as an admin.</p>
+        )}
+        <div className="grid gap-4 sm:grid-cols-2">
+          {users.map((user) => (
+            <UserCard key={user.id} user={user} />
+          ))}
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
+  </div>
   );
 }
