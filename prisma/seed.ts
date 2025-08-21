@@ -1,4 +1,5 @@
-import { PrismaClient, Prisma } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
+import { randomBytes, scryptSync } from 'crypto'
 
 const prisma = new PrismaClient()
 
@@ -33,14 +34,35 @@ const userData: Prisma.UserCreateInput[] = [
           published: true,
         },
       ],
-    },
-  }
-]
 
-export async function main() {
-  for (const u of userData) {
-    await prisma.user.create({ data: u })
-  }
+    },
+  })
+
+  await prisma.user.create({
+    data: {
+      name: 'Bob',
+      email: 'bob@prisma.io',
+      role: 'USER',
+      password: hashPassword('password'),
+      posts: {
+        create: [
+          {
+            title: 'Follow Prisma on Twitter',
+            content: 'https://www.twitter.com/prisma',
+            published: true,
+          },
+        ],
+      },
+    },
+  })
 }
 
 main()
+  .then(async () => {
+    await prisma.$disconnect()
+  })
+  .catch(async (e) => {
+    console.error(e)
+    await prisma.$disconnect()
+    process.exit(1)
+  })
