@@ -7,6 +7,7 @@ const userData: Prisma.UserCreateInput[] = [
     name: 'Alice',
     email: 'alice@prisma.io',
     role: 'ADMIN',
+    password: 'password123',
     posts: {
       create: [
         {
@@ -25,6 +26,7 @@ const userData: Prisma.UserCreateInput[] = [
     name: 'Bob',
     email: 'bob@prisma.io',
     role: 'USER',
+    password: 'password123',
     posts: {
       create: [
         {
@@ -39,7 +41,15 @@ const userData: Prisma.UserCreateInput[] = [
 
 export async function main() {
   for (const u of userData) {
-    await prisma.user.create({ data: u })
+    await prisma.user.upsert({
+      where: { email: u.email },
+      update: {
+        name: u.name,
+        role: u.role,
+        password: u.password,
+      },
+      create: u,
+    })
   }
 }
 
