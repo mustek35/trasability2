@@ -2,7 +2,9 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import prisma from "@/lib/prisma";
-import bcrypt from "bcryptjs";
+
+import { scryptSync, timingSafeEqual } from "node:crypto";
+
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -21,11 +23,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
 
-        const isValid = await bcrypt.compare(
-          credentials.password,
-          user.password
-        );
-        if (!isValid) {
+        const [salt, key] = user.password.split(":");
+        const hashedBuffer = scryptSync(credentials.password, salt, 64);
+        const keyBuffer = Buffer.from(key, "hex");
+
+        if (
+          keyBuffer.length !== hashedBuffer.length ||
+          !timingSafeEqual(keyBuffer, hashedBuffer)
+        ) {
+
           return null;
         }
 
