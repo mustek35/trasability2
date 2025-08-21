@@ -3,32 +3,38 @@ import { randomBytes, scryptSync } from 'crypto'
 
 const prisma = new PrismaClient()
 
-function hashPassword(password: string) {
-  const salt = randomBytes(16).toString('hex')
-  const hash = scryptSync(password, salt, 64).toString('hex')
-  return `${salt}:${hash}`
-}
+const userData: Prisma.UserCreateInput[] = [
+  {
+    name: 'Alice',
+    email: 'alice@prisma.io',
+    role: 'ADMIN',
+    posts: {
+      create: [
+        {
+          title: 'Join the Prisma Discord',
+          content: 'https://pris.ly/discord',
+          published: true,
+        },
+        {
+          title: 'Prisma on YouTube',
+          content: 'https://pris.ly/youtube',
+        },
+      ],
+    },
+  },
+  {
+    name: 'Bob',
+    email: 'bob@prisma.io',
+    role: 'USER',
+    posts: {
+      create: [
+        {
+          title: 'Follow Prisma on Twitter',
+          content: 'https://www.twitter.com/prisma',
+          published: true,
+        },
+      ],
 
-async function main() {
-  await prisma.user.create({
-    data: {
-      name: 'Alice',
-      email: 'alice@prisma.io',
-      role: 'ADMIN',
-      password: hashPassword('password'),
-      posts: {
-        create: [
-          {
-            title: 'Join the Prisma Discord',
-            content: 'https://pris.ly/discord',
-            published: true,
-          },
-          {
-            title: 'Prisma on YouTube',
-            content: 'https://pris.ly/youtube',
-          },
-        ],
-      },
     },
   })
 
