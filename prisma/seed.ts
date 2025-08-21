@@ -1,4 +1,5 @@
 import { PrismaClient, Prisma } from '@prisma/client'
+import { randomBytes, scryptSync } from 'node:crypto'
 
 const prisma = new PrismaClient()
 
@@ -41,14 +42,21 @@ const userData: Prisma.UserCreateInput[] = [
 
 export async function main() {
   for (const u of userData) {
+    const salt = randomBytes(16).toString('hex')
+    const hash = scryptSync(u.password!, salt, 64).toString('hex')
+    const password = `${salt}:${hash}`
+
     await prisma.user.upsert({
       where: { email: u.email },
       update: {
         name: u.name,
         role: u.role,
-        password: u.password,
+        password,
       },
-      create: u,
+      create: {
+        ...u,
+        password,
+      },
     })
   }
 }
