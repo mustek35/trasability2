@@ -6,6 +6,7 @@ const userData: Prisma.UserCreateInput[] = [
   {
     name: 'Alice',
     email: 'alice@prisma.io',
+    role: 'ADMIN',
     posts: {
       create: [
         {
@@ -23,6 +24,7 @@ const userData: Prisma.UserCreateInput[] = [
   {
     name: 'Bob',
     email: 'bob@prisma.io',
+    role: 'USER',
     posts: {
       create: [
         {
