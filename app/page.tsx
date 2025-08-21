@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { auth } from "@/auth";
-import { SignInButton, SignOutButton } from "@/components/auth";
+import { SignOutButton } from "@/components/auth";
 import prisma from "@/lib/prisma";
 import { formatName } from "@/lib/utils";
 
@@ -116,13 +116,7 @@ const users = await prisma.user.findMany({
           <Link href="/" className="text-xl font-bold text-gray-900">
             Superblog
           </Link>
-          <div>
-            {session?.user ? (
-              <UserMenu user={session.user} />
-            ) : (
-              <SignInButton />
-            )}
-          </div>
+          <div>{session?.user && <UserMenu user={session.user} />}</div>
         </div>
       </header>
 
